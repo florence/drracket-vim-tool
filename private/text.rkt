@@ -132,6 +132,7 @@
       ;; ==== private functionality ====
       (inherit get-position set-position
                move-position
+               insert
                copy paste kill undo redo delete
                line-start-position line-end-position position-line
                local-to-global find-wordbreak)
@@ -395,12 +396,12 @@
       ;; insert line after the line the cursor is currently on
       (define/private (insert-line-after)
         (define-values (_start end) (get-current-line-start-end))
-        (send this insert "\n" end))
+        (insert "\n" end))
       
       ;; insert line before the line the cursor is currently on
       (define/private (insert-line-before)
         (define-values (start _end) (get-current-line-start-end))
-        (send this insert "\n" (if (zero? start) start (sub1 start))))
+        (insert "\n" (if (zero? start) start (sub1 start))))
       
       ;; -> (values int int)
       ;; gets the start and end position of the line at the start of current selection
