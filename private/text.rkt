@@ -117,13 +117,14 @@
                 (key-cont event)
                 (call/prompt
                  (λ ()
-                   (cond [(eq? mode 'command) (do-command event)]
-                         [(eq? mode 'insert)  (do-insert event)]
-                         [(eq? mode 'visual)  (do-visual event)]
-                         [(eq? mode 'visual-line) (do-visual-line event)]
-                         [(eq? mode 'search) (do-search event)]
-                         [(eq? mode 'ex) (do-ex event)]
-                         [else (error "Unimplemented mode")])
+                   (match mode
+                     ['command (do-command event)]
+                     ['insert  (do-insert event)]
+                     ['visual  (do-visual event)]
+                     ['visual-line (do-visual-line event)]
+                     ['search (do-search event)]
+                     ['ex (do-ex event)]
+                     [_ (error "Unimplemented mode")])
                    (clear-cont!))
                  vim-prompt-tag
                  (λ (k) (set! key-cont k))))
@@ -233,6 +234,7 @@
           [#\l (move-position 'right)]
           [#\w (move-position 'right #f 'word)]
           [#\b (move-position 'right #f 'word)]
+          [#\G (set-position 0)]
           ;; editing
           [#\J (delete-next-newline-and-whitespace)]
           [#\x (delete)]
@@ -411,6 +413,18 @@
         (define line (position-line (unbox b)))
         (values (line-start-position line)
                 (line-end-position line)))
+      
+      (define/private (get-selection event)
+        (define k (send event get-key-code))
+        (define pb (box #f))
+        (get-position pb)
+        (match k
+          #;[#\G ]
+          [#\g (values 0 (unbox pb))]
+          #;[#\w]
+          #;[#\b]
+          #;[#\%]
+          #;[#\e]))
 
       (super-new))))
 
